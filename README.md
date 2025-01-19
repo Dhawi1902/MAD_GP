@@ -2,7 +2,7 @@
 
 ## Introduction  
 
-  We develop a  To-Do List App is built using Flutter and integrates with Firebase for authentication and data storage. It allows users to manage their tasks efficiently with a simple and intuitive interface.
+  We develop a Shared To-Do List App is built using Flutter and integrates with Firebase for authentication and data storage. It allows users to manage their tasks efficiently with a simple and intuitive interface.
 
 ## Objective  
 
