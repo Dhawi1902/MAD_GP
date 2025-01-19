@@ -53,7 +53,7 @@ The objective of this project is to develop a **collaborative To-Do List App** t
 1. **Clone the repository:**  
    ```bash
    git clone https://github.com/yourusername/MAD_GP.git
-   cd shared-todo-list-app
+   cd MAD_GP
    ```
    
 2. **Install dependicies**
