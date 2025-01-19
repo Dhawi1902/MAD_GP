@@ -2,15 +2,15 @@
 
 ## Introduction  
 
-  We develop a Shared To-Do List App is built using Flutter and integrates with Firebase for authentication and data storage. It allows users to manage their tasks efficiently with a simple and intuitive interface.
+We develop a **Shared To-Do List App** is built using **Flutter** and **Firebase**, allowing multiple users to collaborate on task management. Users can create, share, and manage tasks with others in real time.  
 
 ## Objective  
 
-  The objective of this project is to develop a To-Do List App using Flutter and Firebase, providing users with an efficient way to manage daily tasks. The app aims to:
-  - Enable users to register and log in securely using email and password authentication.
-  - Allow users to add, store, and manage tasks using Firebase Storage.
-  - Provide a profile page for users to view and manage their personal details.
-  - Ensure a user-friendly interface with smooth navigation and responsive design.
+The objective of this project is to develop a **collaborative To-Do List App** that allows users to share and manage tasks efficiently. The app aims to:  
+- Enable users to **register and log in** securely.  
+- Allow users to **add, store, and manage tasks** in real-time.  
+- Provide a **shared task feature** for collaboration.  
+- Ensure a **user-friendly and responsive** design.  
 
 ## Project Members  
 - **MUHAMMAD AL-QARDHAWI BIN AZAHAR** - 2114045  
@@ -18,19 +18,19 @@
 - **MUHAMMAD SYAFIQ** - 2211305 
 
  
-<h1>Features</h1>
+## Features  
+- **User Authentication**: Secure login and registration using email and password.  
+- **Task Management**: Add, store, and manage tasks in Firebase.  
+- **Shared Lists**: Users can share tasks with others and collaborate.  
+- **Profile Page**: View and manage user profile details.
 
-  - User Authentication: Login and registration using email and password.
-  - Task Management: Add tasks and store them in Firebase Storage.
-  - Profile Page: View and manage user profile details.
+## Tech Stack  
+- **Flutter** (Dart)  
+- **Firebase** (Authentication, Firestore)  
+- **Cloud Firestore** (for real-time shared tasks)  
+- **REST API** (for data fetching)  
 
-<h1>Tech Stack</h1>
-
-- Flutter (Dart)
-- Firebase (Authentication & Storage)
-- REST API (for data fetching)
-
-<h1>Screenshots</h1>
+## Screenshot
 
 <b>Login Page</b>
 <b>Profile Page</b>
@@ -52,8 +52,9 @@
 ### Steps  
 1. **Clone the repository:**  
    ```bash
-   git clone https://github.com/yourusername/todo-list-app.git
-   cd todo-list-app
+   git clone https://github.com/yourusername/shared-todo-list-app.git
+   cd shared-todo-list-app
+   ```
    
 2. **Install dependicies**
 
