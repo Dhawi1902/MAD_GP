@@ -23,6 +23,7 @@ The objective of this project is to develop a **collaborative To-Do List App** t
 - **Task Management**: Add, store, and manage tasks in Firebase.  
 - **Shared Lists**: Users can share tasks with others and collaborate.  
 - **Profile Page**: View and manage user profile details.
+- **Settings**: Change to Dark Mode
 
 ## Tech Stack  
 - **Flutter** (Dart)  
@@ -30,11 +31,17 @@ The objective of this project is to develop a **collaborative To-Do List App** t
 - **Cloud Firestore** (for real-time shared tasks)  
 - **REST API** (for data fetching)  
 
-## Screenshot
+## Screenshots  
+| Login Page | Register Page | Incorrect Login  | Profile Page |  
+|------------|--------------|------------------|--------------|  
+| ![Login](screenshot/login.png) | ![Register](screenshot/register.png) | ![Incorrect](screenshot/incorrect.png) | ![Profile](screenshot/profile.png) |  
+|------------|--------------|------------------|--------------| 
+| Create Project | Create Task | Homepage Task  | Projects Page | 
+| ![Create Project](screenshot/createproject.png) | ![Create Task](screenshot/createtask.png) | ![Homepage Task](screenshot/homepagetask'.png) | ![Projects Page](screenshot/to-do.png) |
+|------------|--------------|------------------|--------------| 
+| Projects Settings | Task List | Claim Task (Shared) | Task Claimed | 
+| ![Projects setting](screenshot/projectsetting.png)  | ![Task List](screenshot/Task.png) | ![Claim Task](screenshot/taskss.png) | ![Task claimed](screenshot/claimtask.png) | 
 
-<b>Login Page</b>
-<b>Profile Page</b>
-<b>Add Task Page</b>
 
 ## Getting Started
 
