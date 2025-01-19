@@ -5,7 +5,8 @@ class Project {
   final String id; // Unique ID for the project
   final String name; // Name of the project
   final String ownerId; // User ID of the project owner
-  final List<String> participants; // List of participant user IDs
+  final int index; // Index of the project
+  final List<String> participants; // List of participant usernames
   final bool isPersonal; // True for personal projects
   final DateTime createdAt; // When the project was created
   final Color? cardColor;
@@ -14,6 +15,7 @@ class Project {
     required this.id,
     required this.name,
     required this.ownerId,
+    required this.index,
     required this.participants,
     required this.isPersonal,
     required this.createdAt,
@@ -28,7 +30,8 @@ class Project {
       id: doc.id,
       name: data['name'] ?? 'Unnamed Project',
       ownerId: data['ownerId'] ?? '',
-      participants: List<String>.from(data['participants'] ?? []),
+      index: data['index'],
+      participants: List<String>.from(data['participants'] ?? []), // Usernames
       isPersonal: data['isPersonal'] ?? false,
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       cardColor: data['cardColor'] != null
@@ -43,10 +46,12 @@ class Project {
       'id': id,
       'name': name,
       'ownerId': ownerId,
-      'participants': participants,
+      'index': index,
+      'participants': participants, // Store usernames
       'isPersonal': isPersonal,
       'createdAt': createdAt,
       'cardColor': cardColor?.value,
     };
   }
 }
+

@@ -184,6 +184,7 @@ class _MyAppState extends State<MyApp> {
       title: 'To-Do List App',
       theme: ThemeData(primarySwatch: Colors.blue),
       darkTheme: ThemeData.dark(),
+      debugShowCheckedModeBanner: false,
       themeMode: _themeMode,
       initialRoute: '/login',
       routes: {

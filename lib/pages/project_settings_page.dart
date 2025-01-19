@@ -13,7 +13,7 @@ class ProjectSettingsPage extends StatefulWidget {
 
 class _ProjectSettingsPageState extends State<ProjectSettingsPage> {
   final FirestoreService _firestoreService = FirestoreService();
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
   Color? _selectedColor;
 
   @override
@@ -22,19 +22,21 @@ class _ProjectSettingsPageState extends State<ProjectSettingsPage> {
     _selectedColor = widget.project.cardColor ?? Colors.grey;
   }
 
-  Future<void> _addUser(String email) async {
-    if (email.isEmpty || !email.contains('@')) {
+  Future<void> _addUser(String username) async {
+    if (username.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please enter a valid email address.')),
+        SnackBar(content: Text('Please enter a username.')),
       );
       return;
     }
 
     try {
-      await _firestoreService.inviteUserToProject(widget.project.id, email);
+      await _firestoreService.addUserToProjectByUsername(widget.project.id, username);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('User added successfully!')),
       );
+      _usernameController.clear();
+      setState(() {}); // Refresh UI
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error adding user: $e')),
@@ -102,20 +104,16 @@ class _ProjectSettingsPageState extends State<ProjectSettingsPage> {
         children: [
           // Add User Section
           ListTile(
-            title: Text('Add User'),
+            title: Text('Add User by Username'),
             subtitle: TextField(
-              controller: _emailController,
-              decoration: InputDecoration(labelText: 'User Email'),
+              controller: _usernameController,
+              decoration: InputDecoration(labelText: 'Username'),
             ),
             trailing: IconButton(
               icon: Icon(Icons.add),
               onPressed: () async {
-                if (_emailController.text.trim().isNotEmpty) {
-                  await _firestoreService.addUserToProject(
-                    widget.project.id,
-                    _emailController.text.trim(),
-                  );
-                  setState(() {}); // Refresh UI
+                if (_usernameController.text.trim().isNotEmpty) {
+                  await _addUser(_usernameController.text.trim());
                 }
               },
             ),
@@ -125,7 +123,7 @@ class _ProjectSettingsPageState extends State<ProjectSettingsPage> {
           // Team Members
           ListTile(
             title: Text('Team Members'),
-            subtitle: FutureBuilder<List<Map<String, dynamic>>>(
+            subtitle: FutureBuilder<List<String>>(
               future: _firestoreService.getProjectParticipants(widget.project.id),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -139,9 +137,9 @@ class _ProjectSettingsPageState extends State<ProjectSettingsPage> {
                 final members = snapshot.data!;
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: members.map((member) {
+                  children: members.map((username) {
                     return Text(
-                      '${member['email']} (${member['role']})',
+                      username,
                       style: TextStyle(fontSize: 16),
                     );
                   }).toList(),
@@ -176,13 +174,14 @@ class _ProjectSettingsPageState extends State<ProjectSettingsPage> {
           Divider(),
 
           // Delete Project
-          ListTile(
-            title: Text('Delete Project'),
-            trailing: IconButton(
-              icon: Icon(Icons.delete, color: Colors.red),
-              onPressed: _deleteProject,
+          if (!widget.project.isPersonal) // Only show delete button for non-personal projects
+            ListTile(
+              title: Text('Delete Project'),
+              trailing: IconButton(
+                icon: Icon(Icons.delete, color: Colors.red),
+                onPressed: _deleteProject,
+              ),
             ),
-          ),
         ],
       ),
     );

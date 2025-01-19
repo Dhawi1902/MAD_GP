@@ -5,8 +5,11 @@ class Task {
   final String title;
   final String description;
   final String status;
-  final String? assignee; // Nullable, for unassigned tasks
+  final String? assignee;
+  final String priority;
   final String projectId;
+  final DateTime createdAt;
+  final DateTime? dueDate; // New field for due date
 
   Task({
     required this.id,
@@ -14,7 +17,10 @@ class Task {
     required this.description,
     required this.status,
     this.assignee,
+    required this.priority,
     required this.projectId,
+    required this.createdAt,
+    this.dueDate,
   });
 
   /// Factory constructor to create a Task object from Firestore document
@@ -26,7 +32,12 @@ class Task {
       description: data['description'] ?? '',
       status: data['status'] ?? 'To Do',
       assignee: data['assignee'],
+      priority: data['priority'] ?? 'Medium',
       projectId: data['projectId'] ?? '',
+      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      dueDate: data['dueDate'] != null
+          ? (data['dueDate'] as Timestamp).toDate()
+          : null,
     );
   }
 
@@ -37,7 +48,10 @@ class Task {
       'description': description,
       'status': status,
       'assignee': assignee,
+      'priority': priority,
       'projectId': projectId,
+      'createdAt': createdAt,
+      'dueDate': dueDate,
     };
   }
 }

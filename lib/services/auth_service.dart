@@ -15,18 +15,10 @@ class AuthService {
       final User? user = userCredential.user;
 
       if (user != null) {
-        // Save user details to Firestore
-        await _db.collection('users').doc(user.uid).set({
-          'email': email,
-          'uid': user.uid,
-          'createdAt': FieldValue.serverTimestamp(),
-        });
-        print('User ${user.uid} registered and saved to Firestore.');
+        print('User ${user.uid} signed in successfully.');
       }
 
       return user;
-
-      
     } catch (e) {
       print('Sign-in error: $e');
       throw e;
@@ -49,4 +41,35 @@ class AuthService {
   }
 
   User? get currentUser => _auth.currentUser;
+
+  Future<void> registerWithUsername(String email, String password, String username) async {
+    // Check if username exists
+    final existingUser = await _db
+        .collection('users')
+        .where('username', isEqualTo: username)
+        .get();
+
+    if (existingUser.docs.isNotEmpty) {
+      throw Exception('Username is already taken.');
+    }
+
+    UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    String userId = userCredential.user!.uid;
+
+    // Store user details in Firestore
+    await _db.collection('users').doc(userId).set({
+      'username': username,
+      'email': email,
+      'uid': userId,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+
+    // Ensure personal project exists for the new user
+    await FirestoreService().ensurePersonalProjectExists(userId);
+  }
+
+
 }
