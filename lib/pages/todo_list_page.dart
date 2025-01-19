@@ -234,9 +234,9 @@ class ProjectDetailPage extends StatelessWidget {
   void _showCreateTaskDialog(BuildContext context, Project project) {
     final TextEditingController titleController = TextEditingController();
     final TextEditingController descriptionController = TextEditingController();
-    String selectedPriority = 'Medium'; // Default priority
+    String selectedPriority = 'Medium';
     String? selectedAssignee;
-    DateTime? selectedDueDate; // To store the selected due date
+    DateTime? selectedDueDate;
     TimeOfDay? selectedTime;
 
     showDialog(
@@ -266,34 +266,27 @@ class ProjectDetailPage extends StatelessWidget {
                         ))
                     .toList(),
               ),
-              if (!project.isPersonal)
+              if (!project.isPersonal) // "Assign To" only for shared projects
                 DropdownButtonFormField<String>(
                   value: selectedAssignee,
                   onChanged: (value) => selectedAssignee = value,
                   decoration: InputDecoration(labelText: 'Assign to'),
-                  items: project.participants
-                      .map((username) => DropdownMenuItem(
-                            value: username,
-                            child: Text(username),
-                          ))
-                      .toList(),
+                  items: project.participants.map((username) {
+                    return DropdownMenuItem(value: username, child: Text(username));
+                  }).toList(),
                 ),
               Row(
                 children: [
                   Text('Due Date:'),
-                  SizedBox(width: 10),
                   TextButton(
                     onPressed: () async {
                       DateTime? pickedDate = await showDatePicker(
                         context: context,
                         initialDate: DateTime.now(),
-                        firstDate: DateTime.now(), // No past dates
+                        firstDate: DateTime.now(),
                         lastDate: DateTime(2100),
                       );
-                      if (pickedDate != null) {
-                        selectedDueDate = pickedDate;
-                        print('Selected Due Date: $selectedDueDate');
-                      }
+                      if (pickedDate != null) selectedDueDate = pickedDate;
                     },
                     child: Text(selectedDueDate == null
                         ? 'Select Date'
@@ -308,11 +301,9 @@ class ProjectDetailPage extends StatelessWidget {
                     onPressed: () async {
                       TimeOfDay? pickedTime = await showTimePicker(
                         context: context,
-                        initialTime: selectedTime ?? TimeOfDay.now(),
+                        initialTime: TimeOfDay.now(),
                       );
-                      if (pickedTime != null) {
-                        selectedTime = pickedTime;
-                      }
+                      if (pickedTime != null) selectedTime = pickedTime;
                     },
                     child: Text(selectedTime == null
                         ? 'Select Time'
@@ -335,22 +326,20 @@ class ProjectDetailPage extends StatelessWidget {
 
               if (title.isNotEmpty) {
                 DateTime taskDueDateTime = DateTime(
-                  selectedDueDate!.year,
-                  selectedDueDate!.month,
-                  selectedDueDate!.day,
+                  selectedDueDate?.year ?? DateTime.now().year,
+                  selectedDueDate?.month ?? DateTime.now().month,
+                  selectedDueDate?.day ?? DateTime.now().day,
                   selectedTime?.hour ?? 0,
                   selectedTime?.minute ?? 0,
                 );
 
                 await FirestoreService().createTask(
-                  project.id, // Use the current project ID
+                  project.id,
                   title,
                   description,
                   priority: selectedPriority,
-                  assigneeUsername: project.isPersonal
-                    ? FirebaseAuth.instance.currentUser!.uid // Assign to current user
-                    : selectedAssignee,
-                  dueDate: taskDueDateTime, // Pass the selected due date
+                  assigneeUsername: project.isPersonal ? null : selectedAssignee, // No default for personal projects
+                  dueDate: taskDueDateTime,
                 );
                 Navigator.pop(context);
               } else {
@@ -365,6 +354,8 @@ class ProjectDetailPage extends StatelessWidget {
       ),
     );
   }
+
+
 }
 
 class TaskList extends StatelessWidget {
@@ -431,12 +422,21 @@ class TaskList extends StatelessWidget {
           if (!project.isPersonal && task.assignee == null)
             ElevatedButton(
               onPressed: () async {
-                await FirestoreService().updateTask(
-                  task.id,
-                  assignee: FirebaseAuth.instance.currentUser!.uid,
-                );
+                try {
+                  await FirestoreService().claimTask(
+                    task.id,
+                    FirebaseAuth.instance.currentUser!.uid,
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Task claimed successfully!')),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error claiming task: $e')),
+                  );
+                }
               },
-              child: Text('Claim'),
+              child: Text('Claim Task'),
             ),
         ].whereType<Widget>().toList(), // Remove null widgets
       ),

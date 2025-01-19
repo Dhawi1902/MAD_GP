@@ -115,8 +115,8 @@ class FirestoreService {
     String title,
     String description, {
     String priority = 'Medium',
-    String? assigneeUsername,
-    DateTime? dueDate, // Optional due date
+    String? assigneeUsername, // Allow this to be null
+    DateTime? dueDate,
   }) async {
     final String taskId = FirebaseFirestore.instance.collection('tasks').doc().id;
 
@@ -126,7 +126,7 @@ class FirestoreService {
       'title': title,
       'description': description,
       'priority': priority,
-      'assignee': assigneeUsername,
+      'assignee': assigneeUsername, // This can now remain null
       'status': 'To Do', // Default status
       'createdAt': FieldValue.serverTimestamp(),
       'dueDate': dueDate != null ? Timestamp.fromDate(dueDate) : null,
@@ -134,10 +134,20 @@ class FirestoreService {
   }
 
 
+
   /// Claim an unassigned task
   Future<void> claimTask(String taskId, String userId) async {
+    // Fetch the user's username
+    final userDoc = await _db.collection('users').doc(userId).get();
+    final username = userDoc.data()?['username'];
+
+    if (username == null) {
+      throw Exception('Username not found for the user.');
+    }
+
+    // Update the task's assignee to the username
     await _db.collection('tasks').doc(taskId).update({
-      'assignee': userId,
+      'assignee': username, // Store username instead of user ID
     });
   }
 
@@ -342,15 +352,25 @@ class FirestoreService {
     await FirebaseFirestore.instance.collection('tasks').doc(taskId).update(updates);
   }
 
-  Stream<List<Task>> getAssignedTasks(String userId) {
-    return FirebaseFirestore.instance
+  Stream<List<Task>> getAssignedTasks(String userId) async* {
+    // Fetch the user's username
+    final userDoc = await _db.collection('users').doc(userId).get();
+    final username = userDoc.data()?['username'];
+
+    if (username == null) {
+      throw Exception('Username not found for the user.');
+    }
+
+    // Fetch tasks assigned to the username
+    yield* FirebaseFirestore.instance
         .collection('tasks')
-        .where('assignee', isEqualTo: userId) // Only fetch tasks assigned to the user
+        .where('assignee', isEqualTo: username) // Match by username
         .orderBy('dueDate') // Sort by nearest deadline
         .snapshots()
         .map((snapshot) =>
             snapshot.docs.map((doc) => Task.fromFirestore(doc)).toList());
   }
+
 
   Stream<Project?> getProjectById(String projectId) {
     return FirebaseFirestore.instance
@@ -409,6 +429,25 @@ class FirestoreService {
     }
 
     print('Migration completed.');
+  }
+
+  Future<void> migratePersonalTasksToUsernames() async {
+    final tasks = await _db.collection('tasks').get();
+
+    for (final task in tasks.docs) {
+      final assigneeId = task.data()['assignee'];
+      if (assigneeId != null) {
+        final userDoc = await _db.collection('users').doc(assigneeId).get();
+        final username = userDoc.data()?['username'];
+
+        if (username != null) {
+          // Update the task's assignee to the username
+          await task.reference.update({'assignee': username});
+        }
+      }
+    }
+
+    print('Migration completed: Personal tasks updated with usernames.');
   }
 
 }
